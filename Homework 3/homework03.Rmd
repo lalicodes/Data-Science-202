@@ -1,0 +1,93 @@
+---
+title: 'Homework #3'
+author: "Your Name"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Palmer Penguins
+
+In this homework we will use the `penguins` data set. This data set is part of the `palmerpenguins` package. You can load the data set by executing the command:
+
+```{r}
+data(penguins, package="palmerpenguins")
+```
+
+If the command above throws an error message about the package not found, make sure to install the `palmerpenguins` package on your machine.
+
+The information in the penguins data is collected by several antarctic research teams, who took body measurements of different types of penguins in three different locations. See `?penguins` for a description of all of the variables and a bit of the scientific background of this data.
+
+1.  Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name.
+
+For all of the questions, we would like to see your answer based on R code, i.e. for each question include a code chunk with the relevant code AND write the answer to the question based on the code results in plain English.
+
+2.  How many penguins are part of the studies? What type doe the variables have that were collected? Show your code.
+
+There are 344 penguins in the dataset. The dataset contains various variables, including factors, numerics, and integers.
+
+```{r}
+# Calculate the number of penguins
+n_penguins <- nrow(penguins)
+
+# Display the structure of the dataset
+str(penguins)
+```
+
+3.  How does the length (`bill_length_mm`) of a  penguin's beak relate to its depth (`bill_depth_mm`)?  Use the `ggplot2` package to show a chart, describe the relationship in words. Describe the structure and propose a follow-up. (3 sentences: structure of the plot, what do you see, follow-up). <br>
+
+In the scatterplot, we observe a generally positive linear relationship between a penguin's bill length (x-axis) and bill depth (y-axis). This suggests that penguins with longer bills tend to have deeper bills, indicating a potential correlation between these two measurements. A follow-up analysis could involve calculating the correlation coefficient to quantify the strength of this relationship and conducting a linear regression to make predictions based on bill length.
+
+```{r}
+# Load the ggplot2 package
+library(ggplot2)
+
+# Create a scatterplot
+scatter_plot <- ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  labs(x = "Bill Length (mm)", y = "Bill Depth (mm)", title = "Relationship between Bill Length and Depth")
+
+# Print the scatterplot
+scatter_plot
+```
+
+
+4. To investigate the group structure you see in the scatterplot above (this is a mega hint as to what you should be seeing :) ) you decide to add color to the above scatterplot. First, map island to color, then map species to color. Describe the relationship between length (`bill_length_mm`) of a  penguin's beak and its depth (`bill_depth_mm`) under these two color mappings. How do these color mappings inform the relationship between bill lengths and bill depths? <br
+
+When we map "island" to color, the scatterplot with color coding reveals that penguins from different islands are well-distinguished. We can observe distinct clusters of penguins from each island, indicating that bill length and bill depth vary among islands.
+
+When we map "species" to color, we see that different penguin species also form distinct clusters. Each species has a characteristic range of bill lengths and depths. This color mapping further informs us that bill morphology is species-specific.
+
+These color mappings provide insights into the variation in bill lengths and depths among islands and species, highlighting the importance of considering both island and species factors when studying penguin bill characteristics.
+
+```{r}
+# Add color mapping for island
+scatter_plot_with_color_island <- scatter_plot + 
+  geom_point(aes(color = island))
+
+# Add color mapping for species
+scatter_plot_with_color_species <- scatter_plot + 
+  geom_point(aes(color = species))
+
+# Print both scatterplots
+scatter_plot_with_color_island
+scatter_plot_with_color_species
+```
+
+5. What is the exact relationship between species and islands? Draw a barchart and add some color. Make sure to describe the relationship in words.
+
+In the bar chart, we can clearly see the relationship between penguin species and the islands where they are found. Each species is represented by a separate bar, and the bars are filled with different colors corresponding to the islands.
+
+Adelie penguins are primarily found on Torgersen Island.
+Chinstrap penguins are mainly found on Dream Island.
+Gentoo penguins are predominantly found on Biscoe Island.
+
+
+This chart illustrates the distribution of penguin species across the three islands, demonstrating that each species has a preferred habitat, which is essential information for understanding their ecological dynamics in different regions.
+
+
+```{r}
+ggplot(penguins,aes(x=island,fill=species))+geom_bar()
+```

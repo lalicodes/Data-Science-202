@@ -1,0 +1,73 @@
+---
+title: 'DS 202 - Homework #2'
+author: "Lalitaambiga Balakrishnan"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Swiss Banknotes
+
+1. Download the RMarkdown file with these homework instructions to use as a template for your work.
+Make sure to replace "Your Name" in the YAML with your name.
+2. The R package `mclust` contains a data set called `banknote`, consisting of (physical) measurements on 200 Swiss bank notes, 100 of which are genuine, while the other half is counterfeit. Load this data set (you might have to install the package) using the code below. 
+
+```{r, message = FALSE}
+# install.packages("mclust")
+library(mclust) # if this throws an error of the form 'there is no package called mcmclust', uncomment the line above, run it once, then comment the line out again and run the code chunk again.
+data(banknote)
+```
+
+3. (1 pt) Use one of our object inspecting functions and interpret the result in the data that you see. 
+```{r}
+# Use the head() function to display the first few rows of the dataset
+head(banknote)
+
+# Use the summary() function to get summary statistics of the dataset
+summary(banknote)
+```
+
+```{r}
+# Load ggplot2 package
+library(ggplot2)
+# Create a barchart of Status
+ggplot(data = banknote, aes(x = Status, fill = Status)) +
+  geom_bar() +
+  labs(title = "Distribution of Banknote Status") +
+  theme_minimal()
+```
+
+```{r}
+# Create a histogram of Bottom by Status
+ggplot(data = banknote, aes(x = Bottom, color = Status, fill = Status)) +
+  geom_histogram(alpha = 0.5, binwidth = 0.5) +
+  labs(title = "Histogram of Bottom by Status",
+       x = "Bottom",
+       y = "Count") +
+  theme_minimal()
+
+```
+
+
+
+6. (1 pt) Use the package `ggplot2` to draw a scatterplot of two (continuous) measurements, color by `Status`. Find a pair of measurements that allow you to separate perfectly between genuine and counterfeit banknotes. 
+```{r}
+ggplot(data = banknote, aes(x = Diagonal, y = Right, color = Status))+
+  geom_point()
+```
+
+
+7. (4.5 pts) For each of the three figures above, write a three sentence summary, describing the
+    a. **structure of the plot**: what type of plot is it? Which variables are mapped to x, to y, and to the (fill) color?
+    b. **main message of the plot**: what is your main finding, i.e. what do you want viewers to learn from the plot?
+    c. **additional message**: point out anomalies or outliers, if there are any.
+    
+
+Plot #1: The bar chart illustrates the distribution of bill status (counterfeit vs. genuine) on the x-axis, with bars colored to represent the respective status and the count of bills on the y-axis. It reveals a balanced dataset with an equal count of 100 counterfeit and 100 genuine bills, indicating no outliers.
+
+Plot #2: This histogram displays the distribution of bottom margin widths on the x-axis, with counts on the y-axis, and differentiates between counterfeit and genuine bills through color. It demonstrates that smaller bottom margin widths are more common in genuine bills, while larger bottom margin widths tend to be associated with counterfeit bills. Notably, there are no significant outliers in this dataset.
+
+Plot #3: The scatterplot visualizes the relationship between diagonal length (x-axis) and the width of the right edge (y-axis), with points colored to indicate bill status (real vs. counterfeit). It highlights that genuine bills typically have a larger diagonal length (around 142 mm) and a smaller right edge width (around 129.5 mm), whereas counterfeit bills tend to exhibit a smaller diagonal length (approximately 139.5 mm) and a larger right edge width (approximately 130.25 mm). A clear diagonal boundary separates the two categories, with a potential outlier in the form of a genuine bill with a diagonal length of 141 mm and a right edge width slightly above 131 mm. However, this outlier does not significantly impact the overall observations drawn from the data.
+

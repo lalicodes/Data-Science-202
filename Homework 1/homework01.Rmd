@@ -1,0 +1,48 @@
+---
+title: 'DS 202 - Homework #1'
+author: "Lalitaambigai Balakrishnan"
+date: "09/04/23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+1. How to enter data dynamically into matrix in R programming
+
+2. https://stackoverflow.com/questions/64399358/how-to-enter-data-dynamically-into-matrix-in-r-programming
+
+![Screenshot](file:///C:/Users/lalyt/OneDrive/Desktop/DS202/Homework/Homework1/screenshot.png)
+
+
+
+
+3. - Lack of Clarity: The question lacks clarity in specifying what exactly the user wants to achieve. It mentions making the code dynamic but doesn't explain the specific requirements or desired behavior clearly.
+
+   -  Missing Details: The question mentions "I want the data entry to be dynamic," but it doesn't provide any information on how the dynamic data entry should work, what the input format should be, or how the output should be structured.
+
+A good question serves as a concise and clear request for information or assistance that others can easily understand and provide helpful responses to. It should demonstrate prior research, show an understanding of the problem, and provide context. Key points from the readings on asking good questions include being specific, providing relevant details, and avoiding overly broad or vague queries. Additionally, demonstrating an effort to troubleshoot or solve the issue independently before seeking help is important.
+
+Analyzing the Stack Overflow question, it falls short in several ways. Firstly, it lacks clarity and specificity. The user mentions wanting to make data entry "dynamic with mentioned columns," but it's unclear what "dynamic" means in this context or which columns they are referring to. Secondly, there's a lack of context and examples to help others understand the problem better. Lastly, the user's responses to clarifying questions from other users are vague, making it difficult to pinpoint the issue.
+
+
+
+
+
+
+4. Improved Question:
+
+Title: How to Create a Dynamic Data Entry System in R
+
+Question:
+I am working on a project in R where I need to create a dynamic data entry system. Specifically, I want to prompt the user to enter data for multiple rows with different columns during runtime. Here's what I aim to achieve:
+
+Prompt the user to specify the number of rows of data they want to enter.
+For each row, prompt the user to enter data for specific columns, such as name, ID, roll number, and marks in science and social exams.
+Store the entered data into a matrix for further processing.
+Could someone guide me on how to implement such a dynamic data entry system in R? I appreciate any code examples or step-by-step instructions.
+

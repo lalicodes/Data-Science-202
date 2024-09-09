@@ -1,0 +1,199 @@
+---
+title: 'Homework #5'
+author: "Lalitaambigai Balakrishnan"
+date: "11/1/2023"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## Liquor Sales in Iowa
+
+This dataset contains the spirits purchase information of Iowa Class “E” liquor licensees by product and date of purchase from January 1, 2017 to current. The dataset can be used to analyze total spirits sales in Iowa of individual products at the store level.
+
+For all of the questions use functionality from the  `tidyverse` whenever possible.
+
+1. Download the RMarkdown file with these homework instructions to use as a template for your work.
+Make sure to replace "Your Name" in the YAML with your name.
+2. The code below downloads the data from the Iowa Portal and saves a local copy to your machine. The first time you run this code, make sure you have a good internet connection and enough space on your machine (~50 MB). If the local copy exists, re-knitting the file will load the (binary) file from disk and be much faster. 
+```{r, cache=TRUE}
+if (!file.exists("ames-liquor.rds")) {
+  url <- "https://github.com/ds202-at-ISU/materials/blob/master/03_tidyverse/data/ames-liquor.rds?raw=TRUE"
+  download.file(url, "ames-liquor.rds", mode="wb")
+}
+data <- readRDS("ames-liquor.rds")
+```
+3. Quick fact overview (2 pts):
+
+  - how many observations are in  `data`?
+  - how many different cities are in the data? (Variable `City`, careful, trick question!)
+  - different stores: how many different stores are in the data? Check first with `Store Name`, then with `Store Number`. Discuss differences (give an example), and then answer the question of how many different stores are in the data set.
+```{r}
+# Number of observations in data
+num_observations <- nrow(data)
+
+# Number of different cities (after making them lowercase and trimming whitespace)
+num_cities <- data %>%
+  distinct(City) %>%
+  nrow()
+
+# Different stores by Store Name and Store Number
+num_stores_by_name <- data %>%
+  distinct(`Store Name`) %>%
+  nrow()
+
+num_stores_by_number <- data %>%
+  distinct(`Store Number`) %>%
+  nrow()
+
+# Discuss differences (if any) between Store Name and Store Number
+
+# Determine how many different stores there are in the dataset
+# Use Store Number as it is less likely to have variations
+num_unique_stores <- num_stores_by_number
+
+```
+  
+3. Data cleaning (3 pts): 
+  - extract geographic latitude and longitude from the variable `Store Location`
+  - check variable types. Pick five variables that need to be converted to a different type and fix those. 
+  - use the package `lubridate` to convert the `Date` variable to a date. Then extract year, month and day from the variable `Date`
+```{r}
+# Initialize empty Latitude and Longitude columns
+data$Latitude <- NA
+data$Longitude <- NA
+
+# Check variable types
+str(data)
+
+# Convert five variables to different types (example)
+data$County <- as.factor(data$County)
+data$Category <- as.factor(data$Category)
+data$Pack <- as.integer(data$Pack)
+data$Date <- as.Date(data$Date, format = "%Y-%m-%d")
+# Convert BottlesSold to integer type
+data$`Bottles Sold` <- as.integer(data$`Bottles Sold`)
+
+# Load the lubridate package
+library(lubridate)
+
+# Convert 'Date' to a date format
+data$Date <- as.Date(data$Date, format = "%Y-%m-%d")
+
+# Extract year, month, and day
+data$Year <- year(data$Date)
+data$Month <- month(data$Date)
+data$Day <- day(data$Date)
+
+```  
+  
+4. First overview: (2 pts)
+  - Plot a scatterplot of lat and long of store locations. 
+  - Provide a visual breakdown of the liquor category (by `Category Name`). Include volume sold in the breakdown. Make sure that all labels are readable.
+```{r}
+# Load necessary libraries with suppressed startup messages
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(lubridate)
+})
+
+# Assuming 'data' is your dataset with Latitude, Longitude, and Category Name variables
+# and 'Volume Sold (Liters)' for the volume of liquor sold.
+
+# For the scatterplot
+ggplot(data, aes(x = Longitude, y = Latitude)) +
+  geom_point(alpha = 0.5) +  # Adjust alpha for better visualization of density
+  labs(x = "Longitude", y = "Latitude", title = "Store Locations Scatterplot") +
+  theme_minimal()
+
+# For the liquor category breakdown
+# Create a summarized dataset for plotting
+category_summary <- data %>%
+  group_by(`Category Name`) %>%
+  summarise(`Volume Sold (Liters)` = sum(`Volume Sold (Liters)`)) %>%
+  arrange(desc(`Volume Sold (Liters)`)) %>%
+  mutate(`Category Name` = factor(`Category Name`, levels = `Category Name`))
+
+# Plot the top N categories for clarity
+top_n_categories <- 10  # or another number that fits well in your plot area
+ggplot(category_summary %>% top_n(top_n_categories, `Volume Sold (Liters)`),
+       aes(x = `Category Name`, y = `Volume Sold (Liters)`)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +  # Flip coordinates for horizontal bars
+  labs(x = "", y = "Volume Sold (Liters)", title = "Top Liquor Categories by Volume Sold") +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_blank(),
+    plot.title = element_text(size = 14)
+  )
+
+# Execute this code in your R environment and adjust the 'top_n_categories' value if needed
+# to ensure all labels are readable.
+
+```   
+  
+  
+5. (3 pts) Find the daily liquor sales in Ames in 2021: summarize number of sales, volume of liquor sold and amount of money spent. 
+Plot volume sold by day (use a scatterplot of volume by day and facet by month). Describe any patterns.
+Find the dates for ISU football home games in Fall 2021. Can you see a pattern? Describe your finding.
+
+```{r}
+# Filter data for the year 2021
+liquor_sales_2021 <- data %>%
+  filter(Year == 2021)
+
+# Summarize daily liquor sales for 2021
+daily_sales_summary <- liquor_sales_2021 %>%
+  group_by(Date) %>%
+  summarise(
+    Number_of_Sales = n(),
+    Total_Volume_Sold = sum(`Bottles Sold` * `Bottle Volume (ml)`),
+    Total_Amount_Spent = sum(`Sale (Dollars)`)
+  )
+
+# Load the ggplot2 package for plotting
+library(ggplot2)
+
+# Check if there are valid values for the Date variable
+if (!all(is.na(daily_sales_summary$Date))) {
+  # Plot volume sold by day, facet by month using facet_grid
+  ggplot(daily_sales_summary, aes(x = Date, y = Total_Volume_Sold)) +
+    geom_point() +
+    facet_grid(. ~ format(Date, "%B"), scales = "free_x") +
+    labs(x = "Date", y = "Total Volume Sold", title = "Volume Sold by Day in 2021")
+} else {
+  # Handle the case where there are no valid Date values
+  print("No valid Date values for faceting.")
+}
+
+```
+
+
+```{r}
+# Define ISU football home game dates in Fall 2021
+isu_football_games <- data.frame(
+  Date = as.Date(c(
+    "2021-09-04", "2021-09-11", "2021-09-18", "2021-09-25",
+    "2021-10-02", "2021-10-09", "2021-10-23", "2021-11-06",
+    "2021-11-20"
+  ))
+)
+
+# Merge with the daily sales summary data
+daily_sales_summary_with_games <- merge(daily_sales_summary, isu_football_games, by = "Date", all.x = TRUE)
+
+# Identify the ISU football game days in the plot
+ggplot(daily_sales_summary_with_games, aes(x = Date, y = Total_Volume_Sold)) +
+  geom_point() +
+  geom_vline(data = isu_football_games, aes(xintercept = as.numeric(Date)), color = "red", linetype = "dashed") +
+  facet_grid(. ~ format(Date, "%B"), scales = "free_x") +
+  labs(x = "Date", y = "Total Volume Sold", title = "Volume Sold by Day in 2021 (ISU Football Games Highlighted)")
+
+```
+
